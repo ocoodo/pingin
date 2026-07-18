@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy import text
-from app.deps import DbSession
+
+from app.users.router import router as user_router
 
 
 app = FastAPI()
+
+
+app.include_router(user_router)
