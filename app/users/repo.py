@@ -24,3 +24,10 @@ class UserRepo:
             .where(User.username == username)
         )
         return user.scalar_one_or_none()
+    
+    async def get_by_id(self, id: int) -> Optional[User]:
+        user = await self.session.execute(
+            select(User)
+            .where(User.id == id)
+        )
+        return user.scalar_one_or_none()
