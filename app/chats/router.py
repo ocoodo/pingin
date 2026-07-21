@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.chats.schemas import GetDirect
 from app.deps import GetCurrentUser, GetChatService
@@ -6,6 +6,16 @@ from app.exceptions import NotFoundError
 
 
 router = APIRouter()
+
+
+@router.get('/chats/')
+async def get_chats(
+    user: GetCurrentUser,
+    chat_service: GetChatService,
+    page: int = Query(0, ge=0),
+    page_size: int = Query(20, gt=0, le=100)
+):
+    return await chat_service.get_user_chats(user.id, page, page_size)
 
 
 @router.post('/chats/direct')

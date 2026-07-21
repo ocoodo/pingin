@@ -44,5 +44,16 @@ class ChatRepo:
             .having(func.count(func.distinct(ChatMember.user_id)) == target_count)
         )
         
-        result = await self.session.execute(query)
-        return list(result.scalars().unique().all())
+        chats = await self.session.execute(query)
+        return list(chats.scalars().unique())
+    
+    async def get_user_chats(self, user_id: int, limit: int, offset: int) -> list[Chat]:
+        chats = await self.session.execute(
+            select(Chat)
+            .join(ChatMember.chat)
+            .where(ChatMember.user_id == user_id)
+            .order_by(Chat.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(chats.scalars().unique())

@@ -11,8 +11,7 @@ class ChatService:
     
     async def get_direct_chat(self, current_user_id: int, target_user_id: int):
         if (
-            not await self.user_repo.get_by_id(current_user_id)
-            or not await self.user_repo.get_by_id(target_user_id)
+            not await self.user_repo.get_by_id(target_user_id)
         ):
             raise NotFoundError
         
@@ -28,4 +27,12 @@ class ChatService:
         await self.chat_repo.add_member(chat.id, current_user_id)
         await self.chat_repo.add_member(chat.id, target_user_id)
         return ChatOut(id=chat.id, type=chat.type)
-        
+    
+    async def get_user_chats(self, user_id: int, page: int, page_size: int) -> list[ChatOut]:
+        chats = await self.chat_repo.get_user_chats(user_id, page_size, page * page_size)
+        return [
+            ChatOut(
+                id=c.id,
+                type=c.type
+            ) for c in chats
+        ]
