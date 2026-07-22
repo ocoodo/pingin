@@ -1,0 +1,22 @@
+from app.messages.schemas import MessageOut
+from app.messages.repo import MessageRepo
+from app.chats.repo import ChatRepo
+from app.exceptions import NotFoundError
+
+
+class MessageService:
+    def __init__(self, chat_repo: ChatRepo, message_repo: MessageRepo):
+        self.chat_repo = chat_repo
+        self.message_repo = message_repo
+
+    async def send(self, chat_id: int, text: str) -> MessageOut:
+        exists = await self.chat_repo.get_by_id(chat_id)
+        if not exists:
+            raise NotFoundError
+        
+        message = await self.message_repo.add(chat_id, text)
+        return MessageOut(
+            id=message.id,
+            chat_id=message.chat_id,
+            text=message.text
+        )

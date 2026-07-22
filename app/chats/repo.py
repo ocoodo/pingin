@@ -24,6 +24,13 @@ class ChatRepo:
         self.session.add(new_member)
         await self.session.commit()
         return new_member
+
+    async def get_by_id(self, chat_id: int) -> Optional[Chat]:
+        chat = await self.session.execute(
+            select(Chat)
+            .where(Chat.id == chat_id)
+        )
+        return chat.scalar_one_or_none()
     
     async def get_by_members(self, user_ids: list[int], chat_type: Optional[ChatType] = None) -> list[Chat]:
         unique_user_ids = list(set(user_ids))

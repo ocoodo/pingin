@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from app.chats.models import Chat, ChatType, ChatMember
+from app.messages.models import Message
 from app.users.models import User
 from app.auth.models import Session
 from app.database import Model
