@@ -18,10 +18,11 @@ class MessageService:
         if not exists:
             raise NotFoundError
         
-        message = await self.message_repo.add(chat_id, text)
+        message = await self.message_repo.add(chat_id, user_id, text)
         return MessageOut(
             id=message.id,
             chat_id=message.chat_id,
+            sender_id=message.sender_id,
             text=message.text
         )
 
@@ -31,13 +32,12 @@ class MessageService:
             raise ForbiddenError
 
         messages = await self.message_repo.get_by_chat_id(chat_id, limit, before)
-        if not messages:
-            return []
         
         return [
             MessageOut(
                 id=m.id,
                 chat_id=m.chat_id,
+                sender_id=m.sender_id,
                 text=m.text
             ) for m in messages
         ]

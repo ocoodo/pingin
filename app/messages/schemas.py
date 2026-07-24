@@ -8,4 +8,5 @@ class NewMessage(BaseModel):
 class MessageOut(BaseModel):
     id: int
     chat_id: int
+    sender_id: int
     text: str

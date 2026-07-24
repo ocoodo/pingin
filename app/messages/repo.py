@@ -8,9 +8,10 @@ class MessageRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add(self, chat_id: int, text: str) -> Message:
+    async def add(self, chat_id: int, sender_id: int, text: str) -> Message:
         new_message = Message(
             chat_id=chat_id,
+            sender_id=sender_id,
             text=text
         )
         self.session.add(new_message)

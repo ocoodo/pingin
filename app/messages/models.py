@@ -9,4 +9,5 @@ class Message(Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     chat_id: Mapped[int] = mapped_column(ForeignKey('chats.id'))
+    sender_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     text: Mapped[str]
