@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.messages.models import Message
 
@@ -16,4 +17,18 @@ class MessageRepo:
         await self.session.commit()
         return new_message
 
+    async def get_by_chat_id(self, chat_id: int, limit: int, before: int = None) -> list[Message]:
+        query = (
+            select(Message)
+            .where(Message.chat_id == chat_id)
+            .order_by(Message.id.desc())
+        )
+        if before:
+            query = query.where(Message.id < before)
+        query = query.limit(limit)
+        
+        result  = await self.session.execute(query)
+        messages = list(result.scalars())
+        messages.reverse()
+        return messages
     

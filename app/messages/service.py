@@ -1,7 +1,7 @@
 from app.messages.schemas import MessageOut
 from app.messages.repo import MessageRepo
 from app.chats.repo import ChatRepo
-from app.exceptions import NotFoundError
+from app.exceptions import NotFoundError, ForbiddenError
 
 
 class MessageService:
@@ -9,7 +9,11 @@ class MessageService:
         self.chat_repo = chat_repo
         self.message_repo = message_repo
 
-    async def send(self, chat_id: int, text: str) -> MessageOut:
+    async def send(self, chat_id: int, user_id: int, text: str) -> MessageOut:
+        is_member = await self.chat_repo.is_member(chat_id, user_id)
+        if not is_member:
+            raise ForbiddenError
+
         exists = await self.chat_repo.get_by_id(chat_id)
         if not exists:
             raise NotFoundError
@@ -20,3 +24,20 @@ class MessageService:
             chat_id=message.chat_id,
             text=message.text
         )
+
+    async def get_messages(self, chat_id: int, user_id: int, limit: int, before: int) -> list[MessageOut]:
+        is_member = await self.chat_repo.is_member(chat_id, user_id)
+        if not is_member:
+            raise ForbiddenError
+
+        messages = await self.message_repo.get_by_chat_id(chat_id, limit, before)
+        if not messages:
+            return []
+        
+        return [
+            MessageOut(
+                id=m.id,
+                chat_id=m.chat_id,
+                text=m.text
+            ) for m in messages
+        ]

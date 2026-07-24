@@ -25,6 +25,15 @@ class ChatRepo:
         await self.session.commit()
         return new_member
 
+    async def is_member(self, chat_id: int, user_id: int) -> bool:
+        exists = await self.session.execute(
+            select(Chat)
+            .join(ChatMember.chat)
+            .where(Chat.id == chat_id)
+            .where(ChatMember.user_id == user_id)
+        )
+        return exists.scalar_one_or_none() is not None
+
     async def get_by_id(self, chat_id: int) -> Optional[Chat]:
         chat = await self.session.execute(
             select(Chat)
